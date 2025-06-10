@@ -59,3 +59,8 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## Run project and consume the api on you same local maching
+if using expo, run this project using this command: (php artisan serve --host=0.0.0.0 --port=8000)
+
+the base_url is going to be (http://0.0.0.0:8000/api/)
