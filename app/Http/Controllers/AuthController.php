@@ -20,17 +20,12 @@ class AuthController extends Controller
             'password' => 'required|string|min:6|confirmed',
         ]);
         $user = User::create($validate);
-        $token = $user->createToken('auth_token')->plainTextToken;
 
         if ($user) {
             return response()->json([
                 'success' => true,
                 'message' => 'Registered successful',
-                'data' => [
-                    'user' => $user,
-                    'access_token' => $token,
-                    'token_type' => 'Bearer'
-                ]
+                'data' => $user,
             ]);
         } else {
             return response()->json([

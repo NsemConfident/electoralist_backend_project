@@ -14,15 +14,17 @@ class PresidentialCandidateController extends Controller
     public function index()
     {
         $canditates = PresidentialCandidate::all();
-        if ($canditates) {
+        if ($canditates->isEmpty()) {
             return response()->json([
+                'message' => 'No candidates available.',
                 'data' => $canditates
             ], 200);
-        } else {
-            return response()->json([
-                'message' => 'No Candidates availabel',
-            ], 200);
         }
+        return response()->json([
+            'success'=>true,
+            'message' => 'All candidates',
+            'data' => $canditates,
+        ], 200);
     }
 
     /**
@@ -55,9 +57,10 @@ class PresidentialCandidateController extends Controller
         $candidate = PresidentialCandidate::create($validate);
         if ($candidate) {
             return response()->json([
-                'message' => 'Presidential candidate created successfully',
+                'success' => true,
+                'message' => 'Candidate updated successfully.',
                 'data' => $candidate
-            ], 201);
+            ], 200);
         } else {
             return response()->json([
                 'message' => 'Failed to create presidential candidate',
@@ -97,22 +100,35 @@ class PresidentialCandidateController extends Controller
             'phone' => 'nullable|string|max:20',
             'photo' => 'nullable|image|max:2048',
         ]);
+
+        // Handle photo upload
         if ($request->hasFile('photo')) {
             $validate['photo'] = $request->file('photo')->store('presidential_candidates', 'public');
         }
 
-        $presidentialCandidate->update($validate);
-        if ($presidentialCandidate) {
+        // Fill model with new data
+        $presidentialCandidate->fill($validate);
+
+        // Check if anything has changed
+        if (!$presidentialCandidate->isDirty()) {
             return response()->json([
-                'message' => 'Candidate updated successfully.',
-                'data' => $presidentialCandidate
-            ], 201);
-        } else {
-            return response()->json([
-                'message' => 'Candidate updated Failed.',
-            ], 400);
+                'success' => false,
+                'message' => 'No changes detected.',
+                'data' => $presidentialCandidate,
+            ], 200);
         }
+
+        // Save changes
+        $presidentialCandidate->save();
+
+        // Return updated model
+        return response()->json([
+            'success' => true,
+            'message' => 'Candidate updated successfully.',
+            'data' => $presidentialCandidate->refresh(),
+        ], 200);
     }
+
 
     /**
      * Remove the specified resource from storage.

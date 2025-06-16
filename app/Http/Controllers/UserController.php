@@ -71,19 +71,14 @@ class UserController extends Controller
         $validate = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
-            'password' => 'password|min:8|max'
+            'password' => 'password|min:8|confirmed'
         ]);
-        $user = User::update($validate);
-        if ($user) {
-            return response()->json([
-                'data' => $user,
-                'message' => 'User updated successfully',
-            ], 201);
-        } else {
-            return response()->json([
-                'message' => 'request failed',
-            ], 400);
-        }
+        $user->update($validate);
+
+        return response()->json([
+            'data' => $user,
+            'message' => 'User updated successfully',
+        ], 200);
     }
 
     /**
